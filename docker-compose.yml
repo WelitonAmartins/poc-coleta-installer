@@ -1,0 +1,51 @@
+version: '3.5'
+
+services: 
+  db:
+    image: postgres
+    container_name: postgre_server
+    restart: always
+    ports: 
+      - "5432:5432"
+    volumes: 
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "unisenha"
+    networks: 
+      - rango-network
+
+  kafka_cluster:
+    image: lensesio/fast-data-dev
+    container_name: kafka_cluster
+    restart: always
+    ports: 
+      - "9092:9092"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "2181:2181"
+      - "3030:3030"
+    networks: 
+      - rango-network
+
+  msv_rango_pedidos:
+    image: uniliva/msv-rango-pedidos
+    container_name: msv-rango-pedidos-server
+    restart: always
+    depends_on: 
+      - kafka_cluster
+    ports: 
+      - "9090:8080"
+    environment:
+      IP_KAFKA_SERVER: kafka_cluster
+      KAFKA_PORT: 9092 
+    links:
+      - kafka_cluster
+    networks: 
+      - rango-network
+networks:
+  rango-network:
+    driver: bridge
+           
+volumes:
+  db_data:
