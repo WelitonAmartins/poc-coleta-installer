@@ -25,6 +25,9 @@ services:
       - "8083:8083"
       - "2181:2181"
       - "3030:3030"
+    environment:
+      # ADV_HOST: 192.168.10.189
+      ADV_HOST: 192.168.10.189
     networks: 
       - rango-network
 
@@ -43,6 +46,29 @@ services:
       - kafka_cluster
     networks: 
       - rango-network
+
+  msv-rango-cliente-pdv:
+    image: uniliva/msv-rango-cliente-pdv
+    # container_name: msv-rango-cliente-pdv-server
+    restart: always
+    depends_on: 
+      - kafka_cluster
+      - db
+    ports: 
+      - "9091-9099:8080"
+    environment:
+      IP_KAFKA_SERVER: kafka_cluster
+      KAFKA_PORT: 9092 
+      POSTGRE_URL: db
+      POSTGRE_PORT: 5432
+      POSTGRE_DATABASE: postgres
+      POSTGRE_USER: postgres
+      POSTGRE_PASS: unisenha
+    links:
+      - kafka_cluster
+    networks: 
+      - rango-network
+
 networks:
   rango-network:
     driver: bridge
