@@ -64,6 +64,7 @@ services:
       POSTGRE_DATABASE: postgres
       POSTGRE_USER: postgres
       POSTGRE_PASS: unisenha
+      STATUS_PEDIDO_CRON: 0 0/1 * * * ?
     links:
       - kafka_cluster
     networks: 
