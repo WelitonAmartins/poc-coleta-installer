@@ -8,11 +8,11 @@ services:
     ports: 
       - "5432:5432"
     volumes: 
-      - db_data:/var/lib/postgresql/data
+      - poc_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "unisenha"
     networks: 
-      - rango-network
+      - poc-network
 
   kafka_cluster:
     image: lensesio/fast-data-dev
@@ -29,50 +29,34 @@ services:
       # ADV_HOST: 192.168.10.189
       ADV_HOST: 192.168.10.189
     networks: 
-      - rango-network
+      - poc-network
 
-  msv_rango_pedidos:
-    image: uniliva/msv-rango-pedidos
-    container_name: msv-rango-pedidos-server
-    restart: always
-    depends_on: 
-      - kafka_cluster
-    ports: 
-      - "9090:8080"
-    environment:
-      IP_KAFKA_SERVER: kafka_cluster
-      KAFKA_PORT: 9092 
-    links:
-      - kafka_cluster
-    networks: 
-      - rango-network
+  # processador:
+  #   image: martinsweliton/msv-processador-poc
+  #   container_name: msv-processador
+  #   restart: always
+  #   depends_on: 
+  #     - kafka_cluster
+  #     - db
+  #   ports: 
+  #     - "9091-9099:8080"
+  #   environment:
+  #     IP_KAFKA_SERVER: kafka_cluster
+  #     KAFKA_PORT: 9092 
+  #     POSTGRE_URL: db
+  #     POSTGRE_PORT: 5432
+  #     POSTGRE_DATABASE: postgres
+  #     POSTGRE_USER: postgres
+  #     POSTGRE_PASS: unisenha
+  #   links:
+  #     - kafka_cluster
+  #   networks: 
+  #     - rango-network
 
-  msv-rango-cliente-pdv:
-    image: uniliva/msv-rango-cliente-pdv
-    # container_name: msv-rango-cliente-pdv-server
-    restart: always
-    depends_on: 
-      - kafka_cluster
-      - db
-    ports: 
-      - "9091-9099:8080"
-    environment:
-      IP_KAFKA_SERVER: kafka_cluster
-      KAFKA_PORT: 9092 
-      POSTGRE_URL: db
-      POSTGRE_PORT: 5432
-      POSTGRE_DATABASE: postgres
-      POSTGRE_USER: postgres
-      POSTGRE_PASS: unisenha
-      STATUS_PEDIDO_CRON: 0 0/1 * * * ?
-    links:
-      - kafka_cluster
-    networks: 
-      - rango-network
-
+ 
 networks:
-  rango-network:
+  poc-network:
     driver: bridge
            
 volumes:
-  db_data:
+  poc_data:
